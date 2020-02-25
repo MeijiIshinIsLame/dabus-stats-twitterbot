@@ -58,3 +58,11 @@ def get_prompts():
 		if conn is not None:
 			conn.close()
 		return prompts_unweighted, prompts_weighted
+
+prompts_unweighted, prompts_weighted = get_prompts()
+
+print(prompts_unweighted)
+
+print("\n\n\n\n\n\n\n")
+
+print(prompts_weighted)
