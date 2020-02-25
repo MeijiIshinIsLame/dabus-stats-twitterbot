@@ -40,7 +40,7 @@ def get_prompts():
 							sslmode=str(os.environ["SSL_MODE"]),
 							sslrootcert=ssl_root_cert_path,
 							sslkey=ssl_key_path)
-		c = conn.cursor()
+		cur = conn.cursor()
 		cur.execute("SELECT prompt, weight FROM tweet_prompts")
 
 		row = cur.fetchone()
