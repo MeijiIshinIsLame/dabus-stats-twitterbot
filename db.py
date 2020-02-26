@@ -96,31 +96,32 @@ def get_random_date():
 	return ptime.strftime(date_format)
 
 def fetch_results_from_date(date_object):
-	pass
-
-
-def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
-	prompt = random.choice(prompts_weighted)
-
 	conn = None
+	results = ()
 	try:
 		conn = connect_to_database()
 		cur = conn.cursor()
 
-		#if prompt == prompts_unweighted[0]:
-		random_date = get_random_date()
-		cur.execute("SELECT * FROM arrivals WHERE insertdate=%s", (random_date,))
-		random_date_results = cur.fetchall()
-
-		print(random_date_results)
-
+		cur.execute("SELECT * FROM arrivals WHERE insertdate=%s", (date_object,))
+		results = cur.fetchall()
 		cur.close()
-
 	except (Exception, psycopg2.DatabaseError) as error:
 		print(error)
 	finally:
 		if conn is not None:
 			conn.close()
+		return results
+
+
+def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
+	prompt = random.choice(prompts_weighted)
+
+		#if prompt == prompts_unweighted[0]:
+	random_date = get_random_date()
+	results = fetch_results_from_date(random_date)
+
+	for a in results:
+		print(a)
 
 prompts_unweighted, prompts_weighted = get_prompts()
 
