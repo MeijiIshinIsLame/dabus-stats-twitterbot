@@ -80,6 +80,7 @@ def get_first_date():
 		cur.execute("SELECT insertdate FROM arrivals LIMIT 1")
 
 		first_date = cur.fetchone()
+		print(first_date)
 		cur.close()
 
 	except (Exception, psycopg2.DatabaseError) as error:
