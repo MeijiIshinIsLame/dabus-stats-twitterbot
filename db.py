@@ -9,6 +9,18 @@ ssl_cert_path = "client-cert.pem"
 ssl_key_path = "client-key.pem"
 ssl_root_cert_path = "server-ca.pem"
 
+def connect_to_database():
+	conn = psycopg2.connect(database=str(os.environ["DB_NAME"]),
+							user=str(os.environ["DB_USERNAME"]),
+							password=str(os.environ["DB_PASSWORD"]),
+							host=str(os.environ["DB_HOSTNAME"]),
+							port=str(os.environ["DB_PORT"]),
+							sslcert=ssl_cert_path,
+							sslmode=str(os.environ["SSL_MODE"]),
+							sslrootcert=ssl_root_cert_path,
+							sslkey=ssl_key_path)
+	return conn
+
 def create_ssl_certs():
 	with open(ssl_cert_path, 'w+') as f:
 		f.write(os.environ["SSL_CERT"])
@@ -37,15 +49,7 @@ def get_prompts():
 		create_ssl_certs()
 
 	try:
-		conn = psycopg2.connect(database=str(os.environ["DB_NAME"]),
-							user=str(os.environ["DB_USERNAME"]),
-							password=str(os.environ["DB_PASSWORD"]),
-							host=str(os.environ["DB_HOSTNAME"]),
-							port=str(os.environ["DB_PORT"]),
-							sslcert=ssl_cert_path,
-							sslmode=str(os.environ["SSL_MODE"]),
-							sslrootcert=ssl_root_cert_path,
-							sslkey=ssl_key_path)
+		conn = connect_to_database()
 		cur = conn.cursor()
 		cur.execute("SELECT prompt, weight FROM tweet_prompts")
 
@@ -68,20 +72,11 @@ def get_prompts():
 def get_first_date():
 	conn = None
 	try:
-		conn = psycopg2.connect(database=str(os.environ["DB_NAME"]),
-							user=str(os.environ["DB_USERNAME"]),
-							password=str(os.environ["DB_PASSWORD"]),
-							host=str(os.environ["DB_HOSTNAME"]),
-							port=str(os.environ["DB_PORT"]),
-							sslcert=ssl_cert_path,
-							sslmode=str(os.environ["SSL_MODE"]),
-							sslrootcert=ssl_root_cert_path,
-							sslkey=ssl_key_path)
+		conn = connect_to_database()
 		cur = conn.cursor()
 		cur.execute("SELECT insertdate FROM arrivals LIMIT 1")
 
 		first_date = cur.fetchone()
-		print(first_date)
 		cur.close()
 
 	except (Exception, psycopg2.DatabaseError) as error:
@@ -90,7 +85,6 @@ def get_first_date():
 		if conn is not None:
 			conn.close()
 		return first_date[0]
-
 
 def get_random_date():
 	date_format = "%m-%d-%Y"
@@ -104,11 +98,28 @@ def get_random_date():
 def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 	prompt = random.choice(prompts_weighted)
 
+	conn = None
+	try:
+		conn = connect_to_database()
+		cur = conn.cursor()
+
 	if prompt == prompts_unweighted[0]:
-		pass
+		random_date = get_random_date()
+		cur.execute("SELECT * FROM arrivals WHERE date='random_date'")
+		random_date_results = cur.fetchall()
+
+		print(random_date_results)
+
+		cur.close()
+
+	except (Exception, psycopg2.DatabaseError) as error:
+		print(error)
+	finally:
+		if conn is not None:
+			conn.close()
 
 prompts_unweighted, prompts_weighted = get_prompts()
 
 while True:
-	print(get_random_date())
-	time.sleep(5)
+	build_tweet_from_weighted_list()
+	time.sleep(15)
