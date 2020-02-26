@@ -88,7 +88,7 @@ def get_first_date():
 	finally:
 		if conn is not None:
 			conn.close()
-		return first_date
+		return first_date[0]
 
 
 def get_random_date():
