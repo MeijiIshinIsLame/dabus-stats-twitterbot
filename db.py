@@ -95,6 +95,9 @@ def get_random_date():
 	ptime = first_date + prop * (yesterday - first_date)
 	return ptime.strftime(date_format)
 
+def fetch_results_from_date(date_object):
+
+
 def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 	prompt = random.choice(prompts_weighted)
 
@@ -105,7 +108,7 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 
 		#if prompt == prompts_unweighted[0]:
 		random_date = get_random_date()
-		cur.execute("SELECT * FROM arrivals WHERE insertdate='random_date'")
+		cur.execute("SELECT * FROM arrivals WHERE insertdate='%s'", (random_date,))
 		random_date_results = cur.fetchall()
 
 		print(random_date_results)
