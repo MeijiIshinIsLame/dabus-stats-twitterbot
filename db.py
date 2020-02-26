@@ -93,7 +93,7 @@ def get_random_date():
 	prop =  random.random()
 
 	ptime = first_date + prop * (yesterday - first_date)
-	return ptime.strftime(date_format)
+	return ptime #.strftime(date_format)
 
 def fetch_results_from_date(date_object):
 	conn = None
