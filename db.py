@@ -120,20 +120,20 @@ def get_random_stop(result_list):
 def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 	prompt = random.choice(prompts_weighted)
 
-	#if prompt == prompts_unweighted[0]:
-	random_date = get_random_date()
-	results = fetch_results_from_date(random_date)
-	stop = get_random_stop(results)
+	if prompt == prompts_unweighted[0]:
+		random_date = get_random_date()
+		results = fetch_results_from_date(random_date)
+		stop = get_random_stop(results)
 
-	num_of_arrivals = 0
-	for entry in results:
-		if entry[2] == stop:
-			num_of_arrivals += 1
+		num_of_arrivals = 0
+		for entry in results:
+			if entry[2] == stop:
+				num_of_arrivals += 1
 
-	namespace = {"num_of_arrivals": num_of_arrivals, "stop": stop, "date": random_date}
-	tweet = prompt.format(**namespace)
+		namespace = {"num_of_arrivals": num_of_arrivals, "stop": stop, "date": random_date}
+		tweet = prompt.format(**namespace)
 
-	print(tweet)
+		print(tweet)
 
 prompts_unweighted, prompts_weighted = get_prompts()
 
