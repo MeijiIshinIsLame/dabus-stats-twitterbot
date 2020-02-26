@@ -130,7 +130,7 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 			if entry[2] == stop:
 				num_of_arrivals += 1
 
-		namespace = {"num_of_arrivals": num_of_arrivals, "stop": stop, "date": random_date}
+		namespace = {"num_of_arrivals": num_of_arrivals, "stop": stop.strip('\n'), "date": random_date}
 		tweet = prompt.format(**namespace)
 
 		print(tweet)
