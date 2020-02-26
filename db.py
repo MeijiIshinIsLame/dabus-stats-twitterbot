@@ -96,6 +96,7 @@ def get_random_date():
 	return ptime.strftime(date_format)
 
 def fetch_results_from_date(date_object):
+	pass
 
 
 def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
