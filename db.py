@@ -103,14 +103,14 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		conn = connect_to_database()
 		cur = conn.cursor()
 
-		if prompt == prompts_unweighted[0]:
-			random_date = get_random_date()
-			cur.execute("SELECT * FROM arrivals WHERE date='random_date'")
-			random_date_results = cur.fetchall()
+		#if prompt == prompts_unweighted[0]:
+		random_date = get_random_date()
+		cur.execute("SELECT * FROM arrivals WHERE insertdate='random_date'")
+		random_date_results = cur.fetchall()
 
-			print(random_date_results)
+		print(random_date_results)
 
-			cur.close()
+		cur.close()
 
 	except (Exception, psycopg2.DatabaseError) as error:
 		print(error)
