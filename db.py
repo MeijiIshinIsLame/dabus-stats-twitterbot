@@ -87,7 +87,7 @@ def get_first_date():
 		return first_date[0]
 
 def get_random_date():
-	date_format = "%m-%d-%Y"
+	#date_format = "%m-%d-%Y"
 	first_date = get_first_date()
 	yesterday = datetime.now(timezone('US/Hawaii')).date() - timedelta(days=1)
 	prop =  random.random()
@@ -112,6 +112,10 @@ def fetch_results_from_date(date_object):
 			conn.close()
 		return results
 
+def get_random_stop(result_list):
+	random_entry = random.choice(result_list)
+	stop = random_entry[2]
+	return stop
 
 def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 	prompt = random.choice(prompts_weighted)
@@ -119,9 +123,13 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		#if prompt == prompts_unweighted[0]:
 	random_date = get_random_date()
 	results = fetch_results_from_date(random_date)
+	random_stop = get_random_stop(results)
 
-	for a in results:
-		print(a)
+	num_of_arrivals = 0
+	for entry in results:
+		if entry[2] == random_stop:
+			num_of_arrivals += 1
+	print(num_of_arrivals)
 
 prompts_unweighted, prompts_weighted = get_prompts()
 
