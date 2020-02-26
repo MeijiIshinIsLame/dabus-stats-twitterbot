@@ -1,5 +1,6 @@
 import os
 import random
+import time
 import psycopg2
 from datetime import datetime, timedelta
 from pytz import timezone
@@ -108,4 +109,6 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 
 prompts_unweighted, prompts_weighted = get_prompts()
 
-print(get_random_date())
+while True:
+	print(get_random_date())
+	time.sleep(5)
