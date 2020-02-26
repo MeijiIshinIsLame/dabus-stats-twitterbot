@@ -93,13 +93,12 @@ def get_first_date():
 
 def get_random_date():
 	date_format = "%m-%d-%Y"
-	first_date = get_first_date().strftime(date_format)
+	first_date = get_first_date()
 	yesterday = datetime.now(timezone('US/Hawaii')).date() - timedelta(days=1)
-	yesterday = yesterday.strftime(date_format)
 	prop =  random.random()
 
 	ptime = first_date + prop * (yesterday - first_date)
-	return ptime
+	return ptime.strftime(date_format)
 
 def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 	prompt = random.choice(prompts_weighted)
