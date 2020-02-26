@@ -108,4 +108,4 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 
 prompts_unweighted, prompts_weighted = get_prompts()
 
-print(get_random_date)
+print(get_random_date())
