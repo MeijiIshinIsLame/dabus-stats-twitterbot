@@ -109,7 +109,7 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 
 		#if prompt == prompts_unweighted[0]:
 		random_date = get_random_date()
-		cur.execute("SELECT * FROM arrivals WHERE insertdate='%s'", (random_date,))
+		cur.execute("SELECT * FROM arrivals WHERE insertdate=%s", (random_date,))
 		random_date_results = cur.fetchall()
 
 		print(random_date_results)
