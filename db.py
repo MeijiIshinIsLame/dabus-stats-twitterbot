@@ -94,7 +94,7 @@ def get_first_date():
 def get_random_date():
 	date_format = "%m-%d-%Y"
 	first_date = get_first_date().strftime(date_format)
-	yesterday = datetime.now(timezone('US/Hawaii')).date() - timedelta(days=1)
+	yesterday = datetime.now(timezone('US/Hawaii')).date() - datetime.timedelta(days=1)
 	yesterday = yesterday.strftime(date_format)
 	prop =  random.random()
 
