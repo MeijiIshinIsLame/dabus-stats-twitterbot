@@ -112,6 +112,28 @@ def fetch_results_from_date(date_object):
 			conn.close()
 		return results
 
+#work on this later
+def execute_sql_fetchone(query):
+	conn = None
+	results = ()
+	try:
+		conn = connect_to_database()
+		cur = conn.cursor()
+		cur.execute(query)
+		results = cur.fetchone()
+		cur.close()
+	except (Exception, psycopg2.DatabaseError) as error:
+		print(error)
+	finally:
+		if conn is not None:
+			conn.close()
+		return results
+
+def count_all_entries():
+	results = execute_sql_fetchone("SELECT COUNT(*) FROM arrivals")
+	result[0] = count
+	return count
+
 def get_random_stop(result_list):
 	random_entry = random.choice(result_list)
 	stop = random_entry[2]
@@ -132,7 +154,6 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 
 		namespace = {"num_of_arrivals": num_of_arrivals, "stop": stop.rstrip('\n'), "date": random_date}
 		tweet = prompt.format(**namespace)
-
 		print(tweet)
 
 	if prompt == prompts_unweighted[1]:
@@ -147,6 +168,11 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		namespace = {"num_canceled": num_canceled, "date": random_date}
 		tweet = prompt.format(**namespace)
 		print(tweet)
+
+	if prompt == prompts_unweighted[2]:
+		first_date = get_first_date()
+		num_of_arrivals = count_all_entries()
+
 
 prompts_unweighted, prompts_weighted = get_prompts()
 
