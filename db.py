@@ -131,7 +131,7 @@ def execute_sql_fetchone(query):
 
 def count_all_entries():
 	results = execute_sql_fetchone("SELECT COUNT(*) FROM arrivals")
-	result[0] = count
+	count = result[0]
 	return count
 
 def get_random_stop(result_list):
