@@ -130,9 +130,22 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 			if entry[2] == stop:
 				num_of_arrivals += 1
 
-		namespace = {"num_of_arrivals": num_of_arrivals, "stop": stop.rstrip(), "date": random_date}
+		namespace = {"num_of_arrivals": num_of_arrivals, "stop": stop.rstrip('\n'), "date": random_date}
 		tweet = prompt.format(**namespace)
 
+		print(tweet)
+
+	if prompt == prompts_unweighted[1]:
+		random_date = get_random_date()
+		results = fetch_results_from_date(random_date)
+
+		num_canceled = 0
+		for entry in results:
+			if entry[5] == "1":
+				num_canceled += 1
+
+		namespace = {"num_canceled": num_canceled, "date": random_date}
+		tweet = prompt.format(**namespace)
 		print(tweet)
 
 prompts_unweighted, prompts_weighted = get_prompts()
