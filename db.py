@@ -9,6 +9,7 @@ ssl_cert_path = "client-cert.pem"
 ssl_key_path = "client-key.pem"
 ssl_root_cert_path = "server-ca.pem"
 
+#database functions
 def connect_to_database():
 	conn = psycopg2.connect(database=str(os.environ["DB_NAME"]),
 							user=str(os.environ["DB_USERNAME"]),
@@ -22,20 +23,6 @@ def connect_to_database():
 	return conn
 
 def create_ssl_certs():
-	with open(ssl_cert_path, 'w+') as f:
-		f.write(os.environ["SSL_CERT"])
-
-	with open(ssl_key_path, 'w+') as f:
-		f.write(os.environ["SSL_KEY"])
-
-	with open(ssl_root_cert_path, 'w+') as f:
-		f.write(os.environ["SSL_ROOT_CERT"])
-
-def get_prompts():
-	conn = None
-	prompts_unweighted = []
-	prompts_weighted = []
-
 	try:
 		file = open(ssl_cert_path, 'r')
 		file.close()
@@ -46,7 +33,54 @@ def get_prompts():
 		file = open(ssl_root_cert_path, 'r')
 		file.close()
 	except:
-		create_ssl_certs()
+		with open(ssl_cert_path, 'w+') as f:
+			f.write(os.environ["SSL_CERT"])
+
+		with open(ssl_key_path, 'w+') as f:
+			f.write(os.environ["SSL_KEY"])
+
+		with open(ssl_root_cert_path, 'w+') as f:
+			f.write(os.environ["SSL_ROOT_CERT"])
+
+def execute_sql_fetchone(query):
+	conn = None
+	results = ()
+	try:
+		conn = connect_to_database()
+		cur = conn.cursor()
+		cur.execute(query)
+		results = cur.fetchone()
+		cur.close()
+	except (Exception, psycopg2.DatabaseError) as error:
+		print(error)
+	finally:
+		if conn is not None:
+			conn.close()
+		return results
+
+def execute_sql_fetchall_with_query(query, params):
+	conn = None
+	results = ()
+	try:
+		conn = connect_to_database()
+		cur = conn.cursor()
+
+		cur.execute(query, params)
+		results = cur.fetchall()
+		cur.close()
+	except (Exception, psycopg2.DatabaseError) as error:
+		print(error)
+	finally:
+		if conn is not None:
+			conn.close()
+		return results
+
+
+#getters
+def get_prompts():
+	conn = None
+	prompts_unweighted = []
+	prompts_weighted = []
 
 	try:
 		conn = connect_to_database()
@@ -96,38 +130,10 @@ def get_random_date():
 	return ptime #.strftime(date_format)
 
 def fetch_results_from_date(date_object):
-	conn = None
-	results = ()
-	try:
-		conn = connect_to_database()
-		cur = conn.cursor()
-
-		cur.execute("SELECT * FROM arrivals WHERE insertdate=%s", (date_object,))
-		results = cur.fetchall()
-		cur.close()
-	except (Exception, psycopg2.DatabaseError) as error:
-		print(error)
-	finally:
-		if conn is not None:
-			conn.close()
-		return results
-
-#work on this later
-def execute_sql_fetchone(query):
-	conn = None
-	results = ()
-	try:
-		conn = connect_to_database()
-		cur = conn.cursor()
-		cur.execute(query)
-		results = cur.fetchone()
-		cur.close()
-	except (Exception, psycopg2.DatabaseError) as error:
-		print(error)
-	finally:
-		if conn is not None:
-			conn.close()
-		return results
+	query = "SELECT * FROM arrivals WHERE insertdate=%s"
+	params = (date_object,)
+	reults = execute_sql_fetchall_with_query(query, params)
+	return results
 
 def count_all_entries():
 	results = execute_sql_fetchone("SELECT COUNT(*) FROM arrivals")
@@ -156,6 +162,7 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		tweet = prompt.format(**namespace)
 		print(tweet)
 
+
 	if prompt == prompts_unweighted[1]:
 		random_date = get_random_date()
 		results = fetch_results_from_date(random_date)
@@ -169,11 +176,12 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		tweet = prompt.format(**namespace)
 		print(tweet)
 
+
 	if prompt == prompts_unweighted[2]:
 		first_date = get_first_date()
 		num_of_arrivals = count_all_entries()
 
-
+create_ssl_certs()
 prompts_unweighted, prompts_weighted = get_prompts()
 
 while True:
