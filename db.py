@@ -132,7 +132,7 @@ def get_random_date():
 def fetch_results_from_date(date_object):
 	query = "SELECT * FROM arrivals WHERE insertdate=%s"
 	params = (date_object,)
-	reults = execute_sql_fetchall_with_query(query, params)
+	results = execute_sql_fetchall_with_query(query, params)
 	return results
 
 def count_all_entries():
@@ -180,6 +180,7 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 	if prompt == prompts_unweighted[2]:
 		first_date = get_first_date()
 		num_of_arrivals = count_all_entries()
+
 
 create_ssl_certs()
 prompts_unweighted, prompts_weighted = get_prompts()
