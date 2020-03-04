@@ -75,6 +75,22 @@ def execute_sql_fetchall_with_query(query, params):
 			conn.close()
 		return results
 
+def execute_sql_fetchall(query):
+	conn = None
+	results = ()
+	try:
+		conn = connect_to_database()
+		cur = conn.cursor()
+
+		cur.execute(query)
+		results = cur.fetchall()
+		cur.close()
+	except (Exception, psycopg2.DatabaseError) as error:
+		print(error)
+	finally:
+		if conn is not None:
+			conn.close()
+		return results
 
 #getters
 def get_prompts():
@@ -178,9 +194,14 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 
 
 	if prompt == prompts_unweighted[2]:
-		first_date = get_first_date()
 		num_of_arrivals = count_all_entries()
+		first_date = get_first_date()
+		avg_mins_early = execute_sql_fetchall("SELECT AVG(minsoff) FROM public.arrivals WHERE minsoff < 0")
+		avg_mins_late = execute_sql_fetchall("SELECT AVG(minsoff) FROM public.arrivals WHERE minsoff > 0")
 
+		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": avg_mins_late, "mins_early": avg_mins_early}
+		tweet = prompt.format(**namespace)
+		print(tweet)
 
 create_ssl_certs()
 prompts_unweighted, prompts_weighted = get_prompts()
