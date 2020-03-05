@@ -145,6 +145,10 @@ def get_random_date():
 	ptime = first_date + prop * (yesterday - first_date)
 	return ptime #.strftime(date_format)
 
+def format_date(date):
+	date_format = "%m-%d-%Y"
+	return date.strftime(date_format)
+
 def fetch_results_from_date(date_object):
 	query = "SELECT * FROM arrivals WHERE insertdate=%s"
 	params = (date_object,)
@@ -218,7 +222,8 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 
 		mins_late = execute_sql_fetchall_with_query(query, params)
 
-		namespace = {"route": random_route, "mins_late": mins_late, "date": random_date}
+		random_date = format_date(random_date)
+		namespace = {"route": random_route, "mins_late": mins_late[0], "date": random_date}
 		tweet = prompt.format(**namespace)
 		print(tweet)
 
