@@ -156,6 +156,11 @@ def count_all_entries():
 	count = results[0]
 	return count
 
+def get_random_route(result_list):
+	random_entry = random.choice(result_list)
+	route = random_entry[3]
+	return route
+
 def get_random_stop(result_list):
 	random_entry = random.choice(result_list)
 	stop = random_entry[2]
@@ -199,7 +204,21 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		avg_mins_early = execute_sql_fetchall("SELECT AVG(minsoff) FROM public.arrivals WHERE minsoff < 0")
 		avg_mins_late = execute_sql_fetchall("SELECT AVG(minsoff) FROM public.arrivals WHERE minsoff > 0")
 
-		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": avg_mins_late, "mins_early": avg_mins_early}
+		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": avg_mins_late[0], "mins_early": avg_mins_early[0]}
+		tweet = prompt.format(**namespace)
+		print(tweet)
+
+	#Route {route} averaged {mins_late} minutes late on {date}. (out of 45 stops tracked)
+	if prompt == prompts_unweighted[3]:
+		random_date = get_random_date()
+		random_route = get_random_route(fetch_results_from_date(random_date))
+
+		query = "SELECT AVG(minsoff) FROM arrivals WHERE insertdate=%s AND minsoff > 0"
+		params = (random_date,)
+
+		mins_late = execute_sql_fetchall_with_query(query, params)
+
+		namespace = {"route": random_route, "mins_late": mins_late, "date": random_date}
 		tweet = prompt.format(**namespace)
 		print(tweet)
 
