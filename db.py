@@ -221,9 +221,10 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		params = (random_date,)
 
 		mins_late = execute_sql_fetchall_with_query(query, params)
-
+		mins_late = mins_late[0]
 		random_date = format_date(random_date)
-		namespace = {"route": random_route, "mins_late": mins_late[0], "date": random_date}
+		
+		namespace = {"route": random_route, "mins_late": mins_late, "date": random_date}
 		tweet = prompt.format(**namespace)
 		print(tweet)
 
