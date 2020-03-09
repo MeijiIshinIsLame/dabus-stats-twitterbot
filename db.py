@@ -212,7 +212,7 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		avg_mins_late = execute_sql_fetchall("SELECT AVG(minsoff) FROM public.arrivals WHERE minsoff > 0")
 		first_date = format_date(first_date)
 
-		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": format_float(avg_mins_late[0]), "mins_early": avg_mins_early[0]}
+		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": format_float(float(avg_mins_late[0])), "mins_early": format_float(float(avg_mins_early[0]))}
 		tweet = prompt.format(**namespace)
 		print(tweet)
 
