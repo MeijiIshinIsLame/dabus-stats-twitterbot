@@ -207,8 +207,9 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		first_date = get_first_date()
 		avg_mins_early = execute_sql_fetchall("SELECT AVG(minsoff) FROM public.arrivals WHERE minsoff < 0")
 		avg_mins_late = execute_sql_fetchall("SELECT AVG(minsoff) FROM public.arrivals WHERE minsoff > 0")
-
-		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": avg_mins_late[0], "mins_early": avg_mins_early[0]}
+		first_date = format_date(first_date)
+		
+		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": format_float(avg_mins_late[0]), "mins_early": avg_mins_early[0]}
 		tweet = prompt.format(**namespace)
 		print(tweet)
 
@@ -224,10 +225,12 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		mins_late = mins_late[0]
 		random_date = format_date(random_date)
 		
-		namespace = {"route": random_route, "mins_late": "{:.2f}".format(float(mins_late[0])), "date": random_date}
+		namespace = {"route": random_route, "mins_late": format_float(mins_late[0]), "date": random_date}
 		tweet = prompt.format(**namespace)
 		print(tweet)
-		print(type(mins_late))
+
+def format_float(input_float):
+	return "{:.2f}".format(float(input_float))
 
 create_ssl_certs()
 prompts_unweighted, prompts_weighted = get_prompts()
