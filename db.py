@@ -211,10 +211,11 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		avg_mins_early = execute_sql_fetchall("SELECT AVG(minsoff) FROM public.arrivals WHERE minsoff < 0")
 		avg_mins_late = execute_sql_fetchall("SELECT AVG(minsoff) FROM public.arrivals WHERE minsoff > 0")
 		first_date = format_date(first_date)
-		avg_mins_early = avg_mins_early[0]
-		avg_mins_late = avg_mins_late[0]
+		#PLEASE FIX THIS WTF
+		avg_mins_early = avg_mins_early[0][0]
+		avg_mins_late = avg_mins_late[0][0]
 
-		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": format_float(float(avg_mins_late[0])), "mins_early": format_float(float(avg_mins_early[0]))}
+		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": format_float(avg_mins_late), "mins_early": format_float(avg_mins_early)}
 		tweet = prompt.format(**namespace)
 		print(tweet)
 
@@ -227,10 +228,10 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		params = (random_date,)
 
 		mins_late = execute_sql_fetchall_with_query(query, params)
-		mins_late = mins_late[0]
+		mins_late = mins_late[0][0]
 		random_date = format_date(random_date)
 		
-		namespace = {"route": random_route, "mins_late": format_float(mins_late[0]), "date": random_date}
+		namespace = {"route": random_route, "mins_late": format_float(mins_late), "date": random_date}
 		tweet = prompt.format(**namespace)
 		print(tweet)
 
