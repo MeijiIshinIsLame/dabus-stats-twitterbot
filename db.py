@@ -249,6 +249,7 @@ def format_float(input_float):
 
 #####################  MAIN  ##################### 
 THREE_HOURS = 10800
+prompts_unweighted, prompts_weighted = get_prompts()
 print(build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted))
 
 CONSUMER_KEY = keys['consumer_key']
