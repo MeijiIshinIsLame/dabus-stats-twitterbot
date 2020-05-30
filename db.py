@@ -2,8 +2,10 @@ import os
 import random
 import time
 import psycopg2
+import tweepy
 from datetime import datetime, timedelta
 from pytz import timezone
+from math import floor
 
 ssl_cert_path = "client-cert.pem"
 ssl_key_path = "client-key.pem"
@@ -187,7 +189,7 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 
 		namespace = {"num_of_arrivals": num_of_arrivals, "stop": stop.rstrip('\n'), "date": random_date}
 		tweet = prompt.format(**namespace)
-		print(tweet)
+		return tweet
 
 
 	if prompt == prompts_unweighted[1]:
@@ -202,7 +204,7 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		random_date = format_date(random_date)
 		namespace = {"num_canceled": num_canceled, "date": random_date}
 		tweet = prompt.format(**namespace)
-		print(tweet)
+		return tweet
 
 
 	if prompt == prompts_unweighted[2]:
@@ -217,7 +219,7 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 
 		namespace = {"num_of_arrivals": num_of_arrivals, "date": first_date, "mins_late": format_float(avg_mins_late), "mins_early": format_float(avg_mins_early)}
 		tweet = prompt.format(**namespace)
-		print(tweet)
+		return tweet
 
 	#Route {route} averaged {mins_late} minutes late on {date}. (out of 45 stops tracked)
 	if prompt == prompts_unweighted[3]:
@@ -233,14 +235,38 @@ def build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted):
 		
 		namespace = {"route": random_route, "mins_late": format_float(mins_late), "date": random_date}
 		tweet = prompt.format(**namespace)
-		print(tweet)
+		return tweet
 
 def format_float(input_float):
-	return "{:.2f}".format(float(input_float))
+	time_minutes = input_float #its easier to understand this way ok
+	time_seconds = time_minutes * 60
+	minutes_part = floor(time_minutes % 60)
+	seconds_part = floor(time_seconds % 60)
+	return "{m}:{s}".format(m=minutes_part, s=seconds_part)
+	#return "{:.2f}".format(float(input_float))
+
+
+
+#####################  MAIN  ##################### 
+THREE_HOURS = 10800
+print(build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted))
+
+CONSUMER_KEY = keys['consumer_key']
+CONSUMER_SECRET = keys['consumer_secret']
+ACCESS_TOKEN = keys['access_token']
+ACCESS_TOKEN_SECRET = keys['access_token_secret']
+
+auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+auth.secure = True
+api = tweepy.API(auth)
 
 create_ssl_certs()
 prompts_unweighted, prompts_weighted = get_prompts()
 
 while True:
-	build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted)
-	time.sleep(5)
+	contents = build_tweet_from_weighted_list(prompts_unweighted, prompts_weighted)
+	api.update_status(status=contents)
+	print(contents)
+	time.sleep(THREE_HOURS)
+#####################  END MAIN  ##################### 
